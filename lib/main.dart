@@ -1,91 +1,59 @@
+import 'package:barber_app/pages/account_page.dart';
+import 'package:barber_app/pages/login_page.dart';
+import 'package:barber_app/pages/splash_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() async{
+void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
     url: 'https://giilsyistaktzuxysqat.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdpaWxzeWlzdGFrdHp1eHlzcWF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxNzkzMjMsImV4cCI6MjAzOTc1NTMyM30.xJqWVTajVU4J0Sx3eFVefXvs80DJuDkjUFswQxTq36k',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdpaWxzeWlzdGFrdHp1eHlzcWF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQxNzkzMjMsImV4cCI6MjAzOTc1NTMyM30.xJqWVTajVU4J0Sx3eFVefXvs80DJuDkjUFswQxTq36k',
   );
   runApp(const MyApp());
 }
 
+final supabase = Supabase.instance.client;
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'FlutterDemo',
-      theme: ThemeData(
-
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+      title: 'Supabase Flutter',
+      theme: ThemeData.dark().copyWith(
+        primaryColor: Colors.green,
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.green,
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.green,
+          ),
+        ),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const SplashPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  final _future = Supabase.instance.client
-      .from('users')
-      .select();
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: AppBar(
-
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-
-        title: Text(widget.title),
+extension ContextExtension on BuildContext {
+  void showSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(this).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError
+            ? Theme.of(this).colorScheme.error
+            : Theme.of(this).snackBarTheme.backgroundColor,
       ),
-      body: FutureBuilder(
-    future: _future,
-    builder: (context, snapshot) {
-    if (!snapshot.hasData) {
-    return const Center(child: CircularProgressIndicator());
-    }
-    final countries = snapshot.data!;
-    return ListView.builder(
-    itemCount: countries.length,
-    itemBuilder: ((context, index) {
-    final country = countries[index];
-    return ListTile(
-    title: Text(country['firstName']),
-    );
-    }),
-    );
-    },
-      ),
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
