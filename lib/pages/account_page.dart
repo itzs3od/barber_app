@@ -4,6 +4,8 @@ import 'package:barber_app/components/avatar.dart';
 import 'package:barber_app/main.dart';
 import 'package:barber_app/pages/login_page.dart';
 
+import '../const/const.dart';
+
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
 
@@ -14,6 +16,7 @@ class AccountPage extends StatefulWidget {
 class _AccountPageState extends State<AccountPage> {
   final _usernameController = TextEditingController();
   final _websiteController = TextEditingController();
+  String? _userType;
 
   String? _avatarUrl;
   var _loading = true;
@@ -31,6 +34,10 @@ class _AccountPageState extends State<AccountPage> {
       _usernameController.text = (data['username'] ?? '') as String;
       _websiteController.text = (data['website'] ?? '') as String;
       _avatarUrl = (data['avatar_url'] ?? '') as String;
+
+      //determine the user type
+      _userType = await getUserType(data['user_type']);
+
     } on PostgrestException catch (error) {
       if (mounted) context.showSnackBar(error.message, isError: true);
     } catch (error) {
@@ -150,6 +157,8 @@ class _AccountPageState extends State<AccountPage> {
             onUpload: _onUpload,
           ),
           const SizedBox(height: 18),
+          _loading ? const Text("") : Text("Hello $_userType"),
+          const SizedBox(height: 8),
           TextFormField(
             controller: _usernameController,
             decoration: const InputDecoration(labelText: 'User Name'),
@@ -171,3 +180,5 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 }
+
+
